@@ -33,17 +33,17 @@ const DefaultPalette = (mode, skin) => {
       white: whiteColor
     },
     primary: {
-      light: '#E5F00A',
+      light: '#4A83C1',
       main: '#195EA8',
-      dark: '#4A83C1',
-      contrastText: whiteColor,
+      dark: '#114679',
+      contrastText: '#FFFFFF',
       hover: '#7F889B'
     },
     secondary: {
       light: '#7F889B',
       main: '#195EA8',
       dark: '#606A7C',
-      contrastText: whiteColor
+      contrastText: '#FFFFFF'
     },
     error: {
       light: '#FF625F',

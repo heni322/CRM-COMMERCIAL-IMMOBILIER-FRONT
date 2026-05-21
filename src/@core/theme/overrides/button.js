@@ -33,8 +33,28 @@ const Button = theme => {
           }
         },
         contained: {
-          boxShadow: theme.shadows[3],
-          padding: `${theme.spacing(1.75, 5.5)}`
+          boxShadow: `0 4px 12px 0 ${hexToRGBA(theme.palette.primary.main, 0.25)}`,
+          padding: `${theme.spacing(1.75, 5.5)}`,
+          color: '#FFFFFF',
+          '&.MuiButton-containedPrimary': {
+            backgroundColor: theme.palette.primary.main,
+            color: '#FFFFFF',
+            '&:hover': {
+              backgroundColor: theme.palette.primary.dark,
+              boxShadow: `0 6px 16px 0 ${hexToRGBA(theme.palette.primary.main, 0.4)}`
+            }
+          },
+          '&.MuiButton-containedSecondary': {
+            backgroundColor: theme.palette.secondary.main,
+            color: '#FFFFFF',
+            '&:hover': {
+              backgroundColor: theme.palette.secondary.dark
+            }
+          },
+          '&.Mui-disabled': {
+            color: '#FFFFFF',
+            opacity: 0.6
+          }
         },
         outlined: {
           lineHeight: 1.572,
