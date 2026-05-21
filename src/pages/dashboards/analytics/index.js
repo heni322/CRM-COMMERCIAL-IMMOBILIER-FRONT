@@ -1,0 +1,433 @@
+import React, { useState } from 'react'
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
+import {
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Chip,
+  TextField, InputAdornment, TablePagination, Typography
+} from '@mui/material'
+import { useTheme } from '@mui/material/styles'
+import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
+import EnhancedStatCard from 'src/views/dashboards/analytics/EnhancedStatCard'
+import StatisticsRadialBarChart from 'src/components/StatisticsRadialBarChart'
+import StatsChart from 'src/components/StatsChart'
+import IconifyIcon from 'src/@core/components/icon'
+import { useAuth } from 'src/hooks/useAuth'
+import {
+  useGetSoonExpiredFolders,
+  useGetExpiredFolders,
+  useGetEditFolders,
+  useGetVerifiedFolders
+} from 'src/services/dossier.service'
+import {
+  useGetOfferStats,
+  useGetOfferStatsAmounts,
+  useGetOfferStatsByType,
+  useGetOfferStatsDiverge,
+  useGetPropertiesStats,
+  useGetSoldProperties
+} from 'src/services/dashboard.service'
+
+// ─── Section label component ───────────────────────────────────────────────
+const SectionLabel = ({ icon, title, subtitle, accentColor = '#6366f1' }) => {
+  const theme = useTheme()
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+      <Box sx={{
+        width: 38, height: 38, borderRadius: 2.5,
+        background: `${accentColor}18`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+      }}>
+        <IconifyIcon icon={icon} style={{ fontSize: 20, color: accentColor }} />
+      </Box>
+      <Box>
+        <Typography sx={{ fontWeight: 800, fontSize: '0.98rem', color: 'text.primary', lineHeight: 1.2 }}>
+          {title}
+        </Typography>
+        {subtitle && (
+          <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled', mt: 0.2 }}>{subtitle}</Typography>
+        )}
+      </Box>
+    </Box>
+  )
+}
+
+// ─── Divider with label ──────────────────────────────────────────────────
+const DividerLine = ({ label }) => (
+  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, my: 1 }}>
+    <Box sx={{ flex: 1, height: '1px', background: 'divider', bgcolor: 'divider' }} />
+    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.8px', whiteSpace: 'nowrap' }}>
+      {label}
+    </Typography>
+    <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+  </Box>
+)
+
+const AnalyticsDashboard = () => {
+  const auth = useAuth()
+  const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
+
+  const getClientId = localStorage.getItem('userData')
+  let clientData = null
+  try {
+    clientData = getClientId ? JSON.parse(getClientId) : null
+  } catch {
+    clientData = null
+  }
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+
+  const propertyStatsQuery = useGetPropertiesStats()
+  const propertyStats = propertyStatsQuery?.data
+
+  const offerStatsQuery = useGetOfferStats()
+  const offerStats = offerStatsQuery?.data
+
+  const offerAmountsQuery = useGetOfferStatsAmounts()
+  const offerAmounts = offerAmountsQuery?.data
+
+  const offerStatsByTypeQuery = useGetOfferStatsByType()
+  const offerStatsDivergeQuery = useGetOfferStatsDiverge()
+  const offerStatsDiverge = offerStatsDivergeQuery?.data
+
+  const soldPropertiesQuery = useGetSoldProperties()
+  const soldProperties = soldPropertiesQuery?.data ?? []
+
+  const filteredSoldProperties = soldProperties.filter(p => {
+    const q = searchTerm.toLowerCase()
+    return (
+      p.reference?.toLowerCase().includes(q) ||
+      p.entitled?.toLowerCase().includes(q) ||
+      p.project?.toLowerCase().includes(q) ||
+      p.bloc?.toLowerCase().includes(q) ||
+      p.type?.toLowerCase().includes(q)
+    )
+  })
+
+  const paginatedSoldProperties = filteredSoldProperties.slice(
+    page * rowsPerPage, page * rowsPerPage + rowsPerPage
+  )
+
+  const userRole = auth?.user?.role
+
+  const biensCards = [
+    {
+      number: propertyStats?.properties_dispo?.value,
+      icon: 'bi:building-check',
+      title: 'Biens Disponibles',
+      subtitle: 'Prêts à la vente',
+      value: propertyStats?.properties_dispo?.percentage,
+      color: '#10b981'
+    },
+    {
+      number: propertyStats?.properties_no_dispo?.value,
+      icon: 'bi:building-slash',
+      title: 'Biens Indisponibles',
+      subtitle: 'Réservés ou suspendus',
+      value: propertyStats?.properties_no_dispo?.percentage,
+      color: '#f59e0b'
+    },
+    {
+      number: propertyStats?.properties_sold?.value,
+      icon: 'bi:building-fill-check',
+      title: 'Biens Vendus',
+      subtitle: 'Transactions finalisées',
+      value: propertyStats?.properties_sold?.percentage,
+      color: '#ef4444'
+    }
+  ]
+
+  const offresCards = [
+    {
+      number: offerStats?.offre_document?.validate,
+      icon: 'material-symbols:contract',
+      title: 'Offre de Prix',
+      subtitle: 'Documents validés',
+      value: offerStats?.offre_document?.percentage,
+      color: '#7c3aed'
+    },
+    {
+      number: offerStats?.lettre_document?.validate,
+      icon: 'solar:letter-linear',
+      title: 'Lettre de Réservation',
+      subtitle: 'Lettres signées',
+      value: offerStats?.lettre_document?.percentage,
+      color: '#eab308'
+    },
+    {
+      number: offerStats?.promesse_document?.validate,
+      icon: 'mdi:deal',
+      title: 'Promesse de Vente',
+      subtitle: 'Promesses actives',
+      value: offerStats?.promesse_document?.percentage,
+      color: '#f97316'
+    },
+    {
+      number: offerStats?.contract_document?.validate,
+      icon: 'material-symbols:contract-edit',
+      title: 'Contrat',
+      subtitle: 'Contrats finalisés',
+      value: offerStats?.contract_document?.percentage,
+      color: '#ef4444'
+    }
+  ]
+
+  const allFetched =
+    propertyStatsQuery?.isFetched &&
+    offerStatsQuery?.isFetched &&
+    offerAmountsQuery?.isFetched &&
+    offerStatsByTypeQuery?.isFetched &&
+    offerStatsDivergeQuery?.isFetched &&
+    soldPropertiesQuery?.isFetched
+
+  const tableColumns = ['Référence', 'Bien', 'Projet', 'Bloc', 'Type', 'Surface', 'Étage', 'Prix de vente']
+
+  // accent colors
+  const BIENS_COLOR = '#10b981'
+  const OFFRES_COLOR = '#7c3aed'
+
+  if (!allFetched) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 320, flexDirection: 'column', gap: 2 }}>
+        <Box sx={{
+          width: 48, height: 48, borderRadius: '50%',
+          border: '3px solid',
+          borderColor: 'primary.main',
+          borderTopColor: 'transparent',
+          animation: 'spin 0.8s linear infinite',
+          '@keyframes spin': { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } }
+        }} />
+        <Typography sx={{ color: 'text.disabled', fontSize: '0.85rem' }}>Chargement du tableau de bord...</Typography>
+      </Box>
+    )
+  }
+
+  return (
+    <ApexChartWrapper>
+      <Grid container spacing={5}>
+
+        {/* ══════════════════════ BIENS IMMOBILIERS ══════════════════════ */}
+        <Grid item xs={12}>
+          <SectionLabel
+            icon='bi:building'
+            title='Biens Immobiliers'
+            subtitle={"Vue d'ensemble du parc immobilier"}
+            accentColor={BIENS_COLOR}
+          />
+          <Grid container spacing={4}>
+            {biensCards.map((card, i) => (
+              <Grid item xs={12} sm={4} key={i}>
+                <EnhancedStatCard
+                  number={card.number}
+                  icon={card.icon}
+                  title={card.title}
+                  subtitle={card.subtitle}
+                  percentage={card.value}
+                  color={card.color}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+
+        {/* ══════════════════════ DOCUMENTS / OFFRES ══════════════════════ */}
+        <Grid item xs={12}>
+          <SectionLabel
+            icon='mdi:file-document-multiple-outline'
+            title='Documents & Offres'
+            subtitle='Suivi des étapes commerciales'
+            accentColor={OFFRES_COLOR}
+          />
+          <Grid container spacing={4}>
+            {offresCards.map((card, i) => (
+              <Grid item xs={12} sm={6} md={3} key={i}>
+                <EnhancedStatCard
+                  number={card.number}
+                  icon={card.icon}
+                  title={card.title}
+                  subtitle={card.subtitle}
+                  percentage={card.value}
+                  color={card.color}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+
+        {/* ══════════════════════ CHARTS ROW ══════════════════════ */}
+        <Grid item xs={12} md={5}>
+          <StatisticsRadialBarChart data={offerStatsDiverge} />
+        </Grid>
+        <Grid item xs={12} md={7}>
+          <StatsChart data={offerAmounts} />
+        </Grid>
+
+        {/* ══════════════════════ SOLD PROPERTIES TABLE ══════════════════════ */}
+        <Grid item xs={12}>
+          <Paper
+            elevation={0}
+            sx={{
+              borderRadius: 4,
+              overflow: 'hidden',
+              border: '1px solid',
+              borderColor: 'divider',
+              boxShadow: isDark ? '0 4px 24px rgba(0,0,0,0.3)' : '0 4px 24px rgba(0,0,0,0.07)'
+            }}
+          >
+            {/* Table Header */}
+            <Box sx={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              px: 3, py: 2.5,
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              background: isDark
+                ? 'linear-gradient(135deg, rgba(239,68,68,0.15) 0%, transparent 100%)'
+                : 'linear-gradient(135deg, #fff5f6 0%, #fff 100%)'
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Box sx={{
+                  width: 42, height: 42, borderRadius: 2.5,
+                  background: '#ef444418',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <IconifyIcon icon='bi:building-fill-check' style={{ color: '#ef4444', fontSize: 22 }} />
+                </Box>
+                <Box>
+                  <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: 'text.primary', lineHeight: 1.2 }}>
+                    Biens Vendus
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled' }}>
+                    {filteredSoldProperties.length} bien(s) au total
+                  </Typography>
+                </Box>
+              </Box>
+
+              <TextField
+                size='small'
+                placeholder='Rechercher un bien...'
+                value={searchTerm}
+                onChange={e => { setSearchTerm(e.target.value); setPage(0) }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position='start'>
+                      <IconifyIcon icon='mdi:magnify' style={{ color: '#9ca3af', fontSize: 18 }} />
+                    </InputAdornment>
+                  )
+                }}
+                sx={{
+                  width: 260,
+                  '& .MuiOutlinedInput-root': { borderRadius: 2.5, fontSize: '0.84rem' }
+                }}
+              />
+            </Box>
+
+            {/* Table */}
+            <TableContainer>
+              <Table size='small'>
+                <TableHead>
+                  <TableRow sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.03)' : '#f9fafb' }}>
+                    {tableColumns.map(col => (
+                      <TableCell key={col} sx={{
+                        fontWeight: 700, fontSize: '0.68rem', color: 'text.disabled',
+                        py: 1.5, textTransform: 'uppercase', letterSpacing: '0.06em',
+                        borderBottom: '2px solid', borderColor: 'divider'
+                      }}>
+                        {col}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedSoldProperties.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} align='center' sx={{ py: 8, color: 'text.disabled', fontSize: '0.875rem' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
+                          <IconifyIcon icon='bi:building-slash' style={{ fontSize: 44, color: '#d1d5db' }} />
+                          <Typography sx={{ color: 'text.disabled', fontSize: '0.88rem' }}>Aucun bien vendu trouvé</Typography>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    paginatedSoldProperties.map((property, index) => (
+                      <TableRow
+                        key={property.id}
+                        sx={{
+                          '&:hover': { bgcolor: isDark ? 'rgba(239,68,68,0.05)' : '#fff5f6' },
+                          bgcolor: index % 2 === 0 ? 'background.paper' : (isDark ? 'rgba(255,255,255,0.02)' : '#fafafa'),
+                          transition: 'background-color 0.15s'
+                        }}
+                      >
+                        <TableCell sx={{ py: 1.5 }}>
+                          <Box component='span' sx={{
+                            fontWeight: 700, fontSize: '0.78rem', color: '#ef4444',
+                            fontFamily: 'monospace', background: '#ef444412',
+                            px: 1.2, py: 0.3, borderRadius: 1.5
+                          }}>
+                            {property.reference ?? '—'}
+                          </Box>
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '0.82rem', fontWeight: 600, color: 'text.primary', py: 1.5 }}>
+                          {property.entitled ?? '—'}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '0.82rem', color: 'text.secondary', py: 1.5 }}>
+                          {property.project ?? '—'}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '0.82rem', color: 'text.secondary', py: 1.5 }}>
+                          {property.bloc ?? '—'}
+                        </TableCell>
+                        <TableCell sx={{ py: 1.5 }}>
+                          <Chip label={property.type ?? '—'} size='small' sx={{
+                            fontSize: '0.68rem', background: '#ef444412',
+                            color: '#ef4444', fontWeight: 700, height: 22, borderRadius: 1.5
+                          }} />
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '0.82rem', color: 'text.secondary', py: 1.5 }}>
+                          {property.surface ? <span>{property.surface} <span style={{ color: '#9ca3af', fontSize: '0.7rem' }}>m²</span></span> : '—'}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '0.82rem', color: 'text.secondary', py: 1.5 }}>
+                          {property.floor ?? '—'}
+                        </TableCell>
+                        <TableCell sx={{ py: 1.5 }}>
+                          <Typography sx={{ fontWeight: 700, fontSize: '0.82rem', color: 'text.primary' }}>
+                            {property.selling_price
+                              ? <>{Number(property.selling_price).toLocaleString('fr-FR')} <span style={{ color: '#9ca3af', fontWeight: 400, fontSize: '0.7rem' }}>DZD</span></>
+                              : '—'}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <TablePagination
+              component='div'
+              count={filteredSoldProperties.length}
+              page={page}
+              onPageChange={(_, newPage) => setPage(newPage)}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={e => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0) }}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+              labelRowsPerPage='Lignes par page:'
+              labelDisplayedRows={({ from, to, count }) => `${from}–${to} sur ${count}`}
+              sx={{
+                borderTop: '1px solid', borderColor: 'divider',
+                '& .MuiTablePagination-toolbar': { fontSize: '0.8rem' },
+                '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                  fontSize: '0.8rem', color: 'text.disabled'
+                }
+              }}
+            />
+          </Paper>
+        </Grid>
+
+      </Grid>
+    </ApexChartWrapper>
+  )
+}
+
+export default AnalyticsDashboard
