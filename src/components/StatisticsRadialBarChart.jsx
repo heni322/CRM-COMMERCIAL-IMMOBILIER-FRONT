@@ -45,7 +45,8 @@ const ApexRadialBarChart = ({ data }) => {
             color: theme.palette.text.primary,
             formatter: w => {
               const avg = w.globals.seriesTotals.reduce((a, b) => a + b, 0) / w.globals.series.length
-              return (avg % 1 === 0 ? avg : avg.toFixed(1)) + '%'
+              
+return (avg % 1 === 0 ? avg : avg.toFixed(1)) + '%'
             }
           }
         }

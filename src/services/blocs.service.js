@@ -8,7 +8,8 @@ import { httpClient, queryKeys, buildParams, paginationParams } from 'src/lib/ap
 
 export const useGetBlocs = ({ paginated = false, search = false, pageSize, page } = {}) => {
   const qs = buildParams({ ...paginationParams({ paginated, page, pageSize }), search })
-  return useQuery({
+  
+return useQuery({
     queryKey: queryKeys.blocs.list({ paginated, search, pageSize, page }),
     queryFn:  () => httpClient.get(`blocs${qs}`).then(r => r.data),
   })
@@ -32,7 +33,8 @@ export const useGetBlocsByResidenceId = ({ residenceId } = {}) => {
 
 export function useCreateBloc() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.post('blocs', values).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -44,7 +46,8 @@ export function useCreateBloc() {
 
 export function useUpdateBloc() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ data, id }) => httpClient.post(`blocs/${id}?_method=PUT`, data).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -57,7 +60,8 @@ export function useUpdateBloc() {
 
 export function useDeleteBloc() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.delete(`blocs/${id}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)

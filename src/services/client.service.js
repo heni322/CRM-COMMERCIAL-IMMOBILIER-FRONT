@@ -17,7 +17,8 @@ export const useGetClientNatures = () => {
 
 export const useToggleActiveClient = () => {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.put(`clients/${id}/disable`).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -30,7 +31,8 @@ export const useToggleActiveClient = () => {
 
 export const useDeleteClient = () => {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.delete(`clients/${id}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -42,7 +44,8 @@ export const useDeleteClient = () => {
 
 export function useUploadDocuments() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ values, clientID }) => httpClient.post(`clients/${clientID}/documents`, values).then(r => r.data),
     onSuccess: (data, { clientID }) => {
       toast.success(data?.message)
@@ -62,7 +65,8 @@ export function useGetClientDocuments(clientID) {
 
 export function useDeleteClientDocument() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.delete(`clients/documents/${id}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)

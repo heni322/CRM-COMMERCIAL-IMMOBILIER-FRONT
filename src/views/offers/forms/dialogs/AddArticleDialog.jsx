@@ -32,7 +32,8 @@ import CustomCurrency from 'src/components/CustomCurrency'
 // Safely coerce any value to a finite number (handles undefined/null/empty/NaN -> 0)
 const num = v => {
   const n = parseFloat(v)
-  return Number.isFinite(n) ? n : 0
+  
+return Number.isFinite(n) ? n : 0
 }
 
 const AddArticleDialog = ({ formData, isDialogOpen, closeDialog, onAddArticle, onEditArticle, step, preferences }) => {
@@ -116,6 +117,7 @@ const AddArticleDialog = ({ formData, isDialogOpen, closeDialog, onAddArticle, o
 
   const handleChange = event => {
     const { name, value } = event.target
+
     /* removed */
     setItemForm({
       ...itemForm,

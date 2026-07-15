@@ -97,7 +97,8 @@ const ResidenceColumn = ({ userRole }) => {
   // Shared state cell used in every role variant
   const stateCell = ({ row }) => {
     const rowState = getStateByModel('DProject', row?.state)
-    return <Icon icon={rowState?.icon} color={theme.palette[rowState?.color]?.main} />
+    
+return <Icon icon={rowState?.icon} color={theme.palette[rowState?.color]?.main} />
   }
 
   // Shared actions cell
@@ -199,10 +200,12 @@ const ResidenceColumn = ({ userRole }) => {
           field: 'state',
           headerName: '',
           align: 'center',
+
           // FIX: was row?.state?.color — state is a raw int, must use getStateByModel
           renderCell: ({ row }) => {
             const rowState = getStateByModel('DProject', row?.state)
-            return (
+            
+return (
               <CustomAvatar sx={{ width: 30, height: 30 }} skin='light' color={rowState?.color} variant='rounded'>
                 <Icon icon={rowState?.icon} />
               </CustomAvatar>

@@ -13,7 +13,8 @@ const apiError = err => {
     const first = Object.values(data.errors)[0]
     if (Array.isArray(first) && first[0]) return first[0]
   }
-  return data?.message || err?.message || 'Une erreur est survenue'
+  
+return data?.message || err?.message || 'Une erreur est survenue'
 }
 
 export const useGetOffers = ({
@@ -34,7 +35,8 @@ export const useGetOffers = ({
     collaborator: collaboratorId,
     property: propertyId,
   })
-  return useQuery({
+  
+return useQuery({
     queryKey: queryKeys.offers.list({ paginated, search, pageSize, page, nature, clientId, collaboratorId, propertyId }),
     queryFn:  () => httpClient.get(`documents${qs}`).then(r => r.data),
   })
@@ -50,7 +52,8 @@ export const useGetOfferById = ({ offerId = '', type = false } = {}) => {
 
 export const useGetPropertyOffers = ({ propertyId = '', paginated = false, search = false, pageSize, page } = {}) => {
   const qs = buildParams({ ...paginationParams({ paginated, page, pageSize }), search })
-  return useQuery({
+  
+return useQuery({
     queryKey: queryKeys.offers.byProperty(propertyId),
     queryFn:  () => httpClient.get(`documents/${propertyId}/property${qs}`).then(r => r.data),
     enabled:  Boolean(propertyId),
@@ -96,7 +99,8 @@ export const useGetBanks = () => {
 
 export function useCreateOffer() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.post('documents', values).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -108,7 +112,8 @@ export function useCreateOffer() {
 
 export function useUpdateOffer() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ data, id }) => httpClient.put(`documents/${id}`, data).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -121,7 +126,8 @@ export function useUpdateOffer() {
 
 export function useDeleteOffer() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.delete(`documents/${id}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -133,7 +139,8 @@ export function useDeleteOffer() {
 
 export function useChangeNature() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.put(`documents/${values?.id}/change/nature`, values).then(r => r.data),
     onSuccess: (data, values) => {
       toast.success(data?.message)
@@ -145,7 +152,8 @@ export function useChangeNature() {
 
 export function useChangeState() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.put(`documents/${values?.id}/change/state`, values).then(r => r.data),
     onSuccess: (data, values) => {
       toast.success(data?.message)
@@ -157,7 +165,8 @@ export function useChangeState() {
 
 export function useCreateOfferPayment() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.post(`documents/${values?.id}/echeances`, values).then(r => r.data),
     onSuccess: (data, values) => {
       toast.success(data?.message)
@@ -169,7 +178,8 @@ export function useCreateOfferPayment() {
 
 export function useUpdateOfferPayment() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.put(`documents/${values?.id}/echeances`, values).then(r => r.data),
     onSuccess: (data, values) => {
       toast.success(data?.message)
@@ -182,6 +192,7 @@ export function useUpdateOfferPayment() {
 export function useCalculateOffer() {
   return useMutation({
     mutationFn: values => httpClient.post('documents/list/calculated', values).then(r => r.data),
+
     // No cache invalidation needed — this is a pure computation endpoint
   })
 }

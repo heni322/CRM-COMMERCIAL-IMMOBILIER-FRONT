@@ -120,7 +120,7 @@ const AnalyticsDashboard = () => {
     {
       number: propertyStats?.properties_no_dispo?.value,
       icon: 'bi:building-slash',
-      title: 'Biens Indisponibles',
+      title: 'Biens Réservés',
       subtitle: 'Réservés ou suspendus',
       value: propertyStats?.properties_no_dispo?.percentage,
       color: '#f59e0b'

@@ -114,6 +114,7 @@ const StepTwoFragment = ({
       step: 1,
       document_lines: calculatedLines
     }))
+
     // Directly update parent so document_lines is always current when Next is clicked
     setFormInputParent({ document_lines: calculatedLines })
     setAllAmounts(prev => {

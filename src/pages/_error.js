@@ -7,6 +7,8 @@
  * instead of the actual error message.
  */
 
+import Link from 'next/link'
+
 function Error({ statusCode }) {
   return (
     <div style={{
@@ -28,7 +30,7 @@ function Error({ statusCode }) {
           ? 'Erreur interne du serveur.'
           : "Une erreur inattendue s'est produite."}
       </p>
-      <a
+      <Link
         href='/'
         style={{
           marginTop: 24,
@@ -41,13 +43,14 @@ function Error({ statusCode }) {
         }}
       >
         Retour à l'accueil
-      </a>
+      </Link>
     </div>
   )
 }
 
 Error.getInitialProps = ({ res, err }) => {
   const statusCode = res ? res.statusCode : err ? err.statusCode : 404
+
   return { statusCode }
 }
 

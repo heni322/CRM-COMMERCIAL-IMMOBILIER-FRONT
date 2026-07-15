@@ -15,7 +15,8 @@ export const useGetPieces = () => {
 
 export function useCreatePiece() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.post('pieces', values).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -27,7 +28,8 @@ export function useCreatePiece() {
 
 export function useDeletePiece() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ entitled }) => httpClient.delete(`pieces/${entitled}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)

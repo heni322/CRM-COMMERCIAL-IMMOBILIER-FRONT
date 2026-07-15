@@ -220,7 +220,9 @@ const CrudDataGrid = memo(
                             checkFiltersSelected()
                             setSelectedRows([])
                           }}
-                          defaultValue={(() => { const d = Array.isArray(filter?.data) ? filter.data : Array.isArray(filter?.data?.data) ? filter.data.data : []; return d.find(item => item?.id === filter?.state?.id) })()} 
+                          defaultValue={(() => { const d = Array.isArray(filter?.data) ? filter.data : Array.isArray(filter?.data?.data) ? filter.data.data : []; 
+
+return d.find(item => item?.id === filter?.state?.id) })()} 
                           id={`validation-basic-${filter?.entitled?.toLowerCase()}`}
                           options={Array.isArray(filter?.data) ? filter.data : Array.isArray(filter?.data?.data) ? filter.data.data : []}
                           getOptionLabel={option => option[filter?.option]}

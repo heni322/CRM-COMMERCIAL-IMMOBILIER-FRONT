@@ -1,4 +1,4 @@
-import {
+﻿import {
   Button,
   Card,
   CardActions,
@@ -90,14 +90,23 @@ const UpdateForm = ({ offerId }) => {
     comment: ''
   })
 
+  // Initialize page state from the server ONCE. Re-running this on every refetch
+  // (e.g. after the Suivant save invalidates the detail query) would reset
+  // activeStep back to the saved step and overwrite the user's selected biens
+  // with stale backend data - that is what made the selection disappear when
+  // moving from "Details biens" to "Total Prix".
+  const initializedRef = useRef(false)
+
   useEffect(() => {
-    // /* removed */
-    if (!offerQuery?.isFetching && offerQuery?.isSuccess) {
+    if (initializedRef.current) return
+    if (!offerQuery?.isFetching && offerQuery?.isSuccess && offerData) {
+      initializedRef.current = true
       setActiveStep(offerData?.information?.step)
       setFormInputParent(offerData?.information)
-      setOfferArticles(offerData?.details)
+      setOfferArticles(Array.isArray(offerData?.details) ? offerData.details : [])
       setOffer(offerData?.information)
       setContratSkeletonLocalData(offerData?.skeleton)
+
       // Seed the ref with already-saved lines so back/forward navigation keeps validation accurate
       if (Array.isArray(offerData?.details) && offerData.details.length) {
         documentLinesRef.current = offerData.details
@@ -105,9 +114,27 @@ const UpdateForm = ({ offerId }) => {
     }
   }, [offerQuery?.isFetching, offerQuery?.isSuccess, offerData])
 
-  // useEffect(() => {
-  //   /* removed */
-  // }, [contratSkeletonLocalData])
+  // The backend regenerates the contract skeleton (which embeds the selected biens)
+  // on every save. The run-once init above intentionally does NOT re-run on refetch,
+  // so the freshly built skeleton would never reach the Confirmation/Contract step
+  // until a full page reload. This effect re-syncs ONLY the skeleton from fresh
+  // server data after each refetch settles, without resetting activeStep / offer /
+  // offerArticles. We skip syncing while the user is on the final Contract step
+  // (activeStep === 4) so we never overwrite their in-progress text edits there.
+  useEffect(() => {
+    if (!initializedRef.current) return
+    if (offerQuery?.isFetching || !offerQuery?.isSuccess) return
+    if (activeStep === 4) return
+
+    // Only adopt the server skeleton when it actually has content. During the brief
+    // window right after a save the backend may momentarily return an empty skeleton;
+    // applying it would blank out the biens list we just rebuilt.
+    const serverSkeleton = offerData?.skeleton
+    const hasContent = Array.isArray(serverSkeleton) ? serverSkeleton.length > 0 : Boolean(serverSkeleton)
+    if (hasContent) {
+      setContratSkeletonLocalData(serverSkeleton)
+    }
+  }, [offerQuery?.isFetching, offerQuery?.isSuccess, offerData?.skeleton, activeStep])
 
   const [selectedArticles, setSelectedArticles] = useState([])
 
@@ -151,7 +178,19 @@ const UpdateForm = ({ offerId }) => {
               values.nature = formInputParent?.nature
               values.comment = formInputParent?.comment
               await updateOfferMutation?.mutateAsync({ data: values, id: offer?.id })
-            } else await createOfferMutation?.mutateAsync(formInputParent)
+
+              // Advance explicitly; we no longer rely on the refetch effect to move steps.
+              setActiveStep(activeStep + 1)
+            } else {
+              const created = await createOfferMutation?.mutateAsync(formInputParent)
+
+              // Capture the newly created offer so later saves target it, then advance.
+              if (created?.information) {
+                setOffer(created.information)
+                setFormInputParent(created.information)
+              }
+              setActiveStep(activeStep + 1)
+            }
 
             setIsLoading(false)
           } catch (error) {
@@ -213,6 +252,9 @@ const UpdateForm = ({ offerId }) => {
             // /* removed */
 
             const response = await updateOfferMutation?.mutateAsync({ data: values, id: offer?.id })
+
+            // Advance explicitly to the Contract (PDF) step.
+            setActiveStep(activeStep + 1)
             setIsLoading(false)
           } catch (error) {
             setIsLoading(false)
@@ -244,6 +286,11 @@ const UpdateForm = ({ offerId }) => {
               // Keep the ref current synchronously so Next-button validation never reads stale state
               if (data && Array.isArray(data.document_lines)) {
                 documentLinesRef.current = data.document_lines
+
+                // Keep offerArticles in sync so later steps (Total Prix, Contract)
+                // initialize from the biens the user just selected, not stale
+                // server data that may not include the new selection yet.
+                setOfferArticles(data.document_lines)
               }
               setFormInputParent(prevState => {
                 const updatedFields = { ...prevState }
@@ -288,6 +335,11 @@ const UpdateForm = ({ offerId }) => {
               // Keep the ref current synchronously so Next-button validation never reads stale state
               if (data && Array.isArray(data.document_lines)) {
                 documentLinesRef.current = data.document_lines
+
+                // Keep offerArticles in sync so later steps (Total Prix, Contract)
+                // initialize from the biens the user just selected, not stale
+                // server data that may not include the new selection yet.
+                setOfferArticles(data.document_lines)
               }
               setFormInputParent(prevState => {
                 const updatedFields = { ...prevState }
@@ -327,6 +379,11 @@ const UpdateForm = ({ offerId }) => {
               // Keep the ref current synchronously so Next-button validation never reads stale state
               if (data && Array.isArray(data.document_lines)) {
                 documentLinesRef.current = data.document_lines
+
+                // Keep offerArticles in sync so later steps (Total Prix, Contract)
+                // initialize from the biens the user just selected, not stale
+                // server data that may not include the new selection yet.
+                setOfferArticles(data.document_lines)
               }
               setFormInputParent(prevState => {
                 const updatedFields = { ...prevState }
@@ -365,6 +422,11 @@ const UpdateForm = ({ offerId }) => {
               // Keep the ref current synchronously so Next-button validation never reads stale state
               if (data && Array.isArray(data.document_lines)) {
                 documentLinesRef.current = data.document_lines
+
+                // Keep offerArticles in sync so later steps (Total Prix, Contract)
+                // initialize from the biens the user just selected, not stale
+                // server data that may not include the new selection yet.
+                setOfferArticles(data.document_lines)
               }
               setFormInputParent(prevState => {
                 const updatedFields = { ...prevState }
@@ -403,6 +465,11 @@ const UpdateForm = ({ offerId }) => {
               // Keep the ref current synchronously so Next-button validation never reads stale state
               if (data && Array.isArray(data.document_lines)) {
                 documentLinesRef.current = data.document_lines
+
+                // Keep offerArticles in sync so later steps (Total Prix, Contract)
+                // initialize from the biens the user just selected, not stale
+                // server data that may not include the new selection yet.
+                setOfferArticles(data.document_lines)
               }
               setFormInputParent(prevState => {
                 const updatedFields = { ...prevState }

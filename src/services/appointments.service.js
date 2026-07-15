@@ -11,7 +11,8 @@ export const useGetAppointments = ({ id = '', resource = '', states = '' } = {})
     ...(resource === 'client' ? { clientId: id } : { documentId: id }),
     ...(states?.length ? { states: `[${states}]` } : {}),
   })
-  return useQuery({
+  
+return useQuery({
     queryKey: queryKeys.appointments.list({ id, resource, states }),
     queryFn:  () => httpClient.get(`appointments${qs}`).then(r => r.data),
     enabled:  Boolean(id),
@@ -35,7 +36,8 @@ export const useGetAppointmentsTypes = () => {
 
 export function useCreateAppointment() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.post('appointments', values).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -47,7 +49,8 @@ export function useCreateAppointment() {
 
 export function useUpdateAppointment() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ data, id }) => httpClient.put(`appointments/${id}`, data).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -60,7 +63,8 @@ export function useUpdateAppointment() {
 
 export function useDeleteAppointment() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.delete(`appointments/${id}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -72,7 +76,8 @@ export function useDeleteAppointment() {
 
 export function useChangeAppointmentState() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id, values }) => httpClient.put(`appointments/${id}/change/state`, values).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)

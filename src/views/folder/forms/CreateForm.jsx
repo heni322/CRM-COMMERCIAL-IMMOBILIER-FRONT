@@ -36,7 +36,7 @@ import { useCreateDossier, useGetAvailableIng, useGetDateFinPrevu, useUploadFile
 
 // import DialogAddUserInfo from './add-user-modal'
 import moment from 'moment'
-import { useGetUserGroups, useGetUsers } from 'src/services/users.service'
+import { useGetUsers } from 'src/services/users.service'
 import FileUploaderMultiple from 'src/components/CustomFileUpload'
 import { useAuth } from 'src/hooks/useAuth'
 import { useGetGroupUsers, useGetGroups } from 'src/services/groups.service'
@@ -111,7 +111,7 @@ const CreateForm = () => {
   const uploadFiles = useUploadFiles()
 
   // const getClientsList = useGetUsers({ role: 'client' })
-  const getClientsList = useGetUserGroups()
+  const getClientsList = useGetUsers({ role: 'client' })
   const getOperationsList = useGetOperations()
   const getCompaniesList = useGetCompanies({ paginated: false })
 

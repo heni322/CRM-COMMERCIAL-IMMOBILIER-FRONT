@@ -24,7 +24,8 @@ export const useDownloadDocument = (documentId = '') => {
 
 export function useDeleteImage() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: id => httpClient.delete(`files/image/${id}`).then(r => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.residences.all })
@@ -36,7 +37,8 @@ export function useDeleteImage() {
 
 export function useDeleteDocument() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: id => httpClient.delete(`files/document/${id}`).then(r => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.residences.all })

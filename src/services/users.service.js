@@ -12,7 +12,8 @@ import { httpClient, queryKeys, buildParams, paginationParams } from 'src/lib/ap
 
 export const useGetUsers = ({ paginated = false, role = false, search = false, pageSize, page, notMe } = {}) => {
   const qs = buildParams({ ...paginationParams({ paginated, page, pageSize }), role, search, notMe })
-  return useQuery({
+  
+return useQuery({
     queryKey: queryKeys.users.list({ paginated, role, search, pageSize, page, notMe }),
     queryFn: () => httpClient.get(`users${qs}`).then(r => r.data),
   })
@@ -35,7 +36,8 @@ export const useGetRoles = () => {
 
 export function useCreateCollaborator() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.post('users', values).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -47,7 +49,8 @@ export function useCreateCollaborator() {
 
 export function useUpdateCollab() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ data, id }) => httpClient.put(`users/${id}`, data).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -60,7 +63,8 @@ export function useUpdateCollab() {
 
 export function useDeleteUser() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.delete(`users/${id}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -72,7 +76,8 @@ export function useDeleteUser() {
 
 export function useDisableUser() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.put(`users/${id}/disable`).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -85,7 +90,8 @@ export function useDisableUser() {
 
 export function useToggleUserStatus() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.put(`users/${id}/toggle-status`).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -116,7 +122,8 @@ export const useGetClients = ({
     clientCategory,
     commercial: commercialId,
   })
-  return useQuery({
+  
+return useQuery({
     queryKey: queryKeys.clients.list({ paginated, role, search, pageSize, page, clientCategory, clientType, commercialId }),
     queryFn:  () => httpClient.get(`clients${qs}`).then(r => r.data),
   })
@@ -146,7 +153,8 @@ export const useGetClientTypes = () => {
 
 export function useCreateUser() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ values }) => httpClient.post('clients', values).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -158,7 +166,8 @@ export function useCreateUser() {
 
 export function useUpdateUser() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ data, id }) => httpClient.put(`clients/${id}`, data).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -171,7 +180,8 @@ export function useUpdateUser() {
 
 export function useDeleteClient() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.delete(`clients/${id}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -193,7 +203,8 @@ export const useGetNotifications = () => {
 
 export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.post(`user-notifications/${id}/vue`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all }),
   })
@@ -201,7 +212,8 @@ export const useMarkNotificationAsRead = () => {
 
 export const useMarkAllNotificationsAsRead = () => {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: () => httpClient.post('user-notifications/vue').then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all }),
   })
@@ -211,7 +223,8 @@ export const useMarkAllNotificationsAsRead = () => {
 
 export function useGenerateToken() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.put(`users/clients/generate-public-link/${id}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)

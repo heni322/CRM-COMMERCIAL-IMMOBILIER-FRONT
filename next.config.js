@@ -13,6 +13,7 @@ const withTM = require('next-transpile-modules')([
 ])
 
 module.exports = withTM({
+  output: 'export',
   env: {
     REACT_APP_BASE_URL: 'http://localhost:8000/',
     PUBLIC_URL: 'http://localhost:3000/'

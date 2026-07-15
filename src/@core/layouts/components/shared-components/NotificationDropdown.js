@@ -78,7 +78,8 @@ const ScrollWrapper = ({ children, hidden }) => {
       <Box sx={{ maxHeight: 349, overflowY: 'auto', overflowX: 'hidden' }}>{children}</Box>
     )
   }
-  return (
+  
+return (
     <PerfectScrollbar options={{ wheelPropagation: false, suppressScrollX: true }}>
       {children}
     </PerfectScrollbar>
@@ -100,7 +101,8 @@ function extractNotifications(queryData) {
   if (!raw) return []
   if (Array.isArray(raw)) return raw          // flat array shape
   if (Array.isArray(raw?.data)) return raw.data // { data: [...] } shape
-  return []
+  
+return []
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────

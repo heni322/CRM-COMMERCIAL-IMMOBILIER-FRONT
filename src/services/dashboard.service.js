@@ -29,10 +29,12 @@ export const useGetOfferStatsDiverge = () => {
 
 export function useDeleteImage() {
   const queryClient = useQueryClient()
-  return useMutation(
+  
+return useMutation(
     async id => {
       const res = await axiosClient.delete(`files/image/${id}`)
-      return res.data
+      
+return res.data
     },
     {
       onSuccess: () => {
@@ -50,10 +52,12 @@ export const useGetSoldProperties = () => {
 
 export function useDeleteDocument() {
   const queryClient = useQueryClient()
-  return useMutation(
+  
+return useMutation(
     async id => {
       const res = await axiosClient.delete(`files/document/${id}`)
-      return res.data
+      
+return res.data
     },
     {
       onSuccess: () => {

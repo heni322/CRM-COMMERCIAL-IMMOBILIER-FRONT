@@ -1,4 +1,4 @@
-// ** React Imports
+﻿// ** React Imports
 import { forwardRef, useEffect, useState } from 'react'
 
 // ** MUI Imports
@@ -77,6 +77,7 @@ const Form = () => {
 
   const [formInput, setFormInput] = useState({
     name: '',
+    civility: 'Mr',
     email: '',
     address: '',
     phone_number_1: '',
@@ -155,7 +156,7 @@ const Form = () => {
               Informations Générales
             </Typography>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <TextField
               variant='standard'
               fullWidth
@@ -167,6 +168,20 @@ const Form = () => {
               error={!!formErrors?.name}
               helperText={renderArrayMultiline(formErrors?.name)}
             />
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth variant='standard'>
+              <InputLabel>Civilité</InputLabel>
+              <Select
+                name='civility'
+                value={formInput?.civility || 'Mr'}
+                onChange={handleChange}
+                label='Civilité'
+              >
+                <MenuItem value='Mr'>Mr</MenuItem>
+                <MenuItem value='Mme'>Mme</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
           <Grid item xs={12} md={6}>
             {!clientNatureQuery?.isFetching && clientNatureQuery?.isSuccess ? (

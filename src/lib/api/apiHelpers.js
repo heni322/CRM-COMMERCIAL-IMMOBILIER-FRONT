@@ -22,7 +22,8 @@ export function extractList(queryData) {
   if (!queryData) return []
   if (Array.isArray(queryData)) return queryData
   if (Array.isArray(queryData?.data)) return queryData.data
-  return []
+  
+return []
 }
 
 /**
@@ -52,7 +53,8 @@ export function extractItem(queryData) {
   if (queryData?.data && typeof queryData.data === 'object' && !Array.isArray(queryData.data)) {
     return queryData.data
   }
-  return queryData
+  
+return queryData
 }
 
 /**
@@ -62,5 +64,6 @@ export function extractItem(queryData) {
 export function extractErrorMessage(error) {
   if (!error) return null
   if (error?.isApiError) return error.message
-  return error?.response?.data?.message ?? error?.message ?? 'Une erreur est survenue.'
+  
+return error?.response?.data?.message ?? error?.message ?? 'Une erreur est survenue.'
 }

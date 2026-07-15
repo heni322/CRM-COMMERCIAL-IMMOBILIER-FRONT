@@ -211,7 +211,9 @@ const PropertyColumn = ({ userRole }) => {
           headerName: 'Statut',
           align: 'center',
 
-          renderCell: ({ row }) => { const s = getStateByModel('DProperty', row?.state); return <CustomChip label={s?.entitled} skin='light' color={s?.color} /> }
+          renderCell: ({ row }) => { const s = getStateByModel('DProperty', row?.state); 
+
+return <CustomChip label={s?.entitled} skin='light' color={s?.color} /> }
         },
         {
           headerAlign: 'center',

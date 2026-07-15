@@ -26,7 +26,8 @@ export const useGetProperties = ({
     usageType,
     state,
   })
-  return useQuery({
+  
+return useQuery({
     queryKey: queryKeys.properties.list({ paginated, search, pageSize, page, propertyType, state, usageType, project }),
     queryFn:  () => httpClient.get(`properties${qs}`).then(r => r.data),
   })
@@ -58,7 +59,8 @@ export const useGetPropertyDocuments = ({ propertyId = '' } = {}) => {
 
 export function useGetPropertiesByResidenceIds({ projects = '' } = {}) {
   const qs = projects?.length ? `?projects=[${projects}]` : ''
-  return useQuery({
+  
+return useQuery({
     queryKey: queryKeys.properties.forOffer(projects),
     queryFn:  () => httpClient.get(`documents/list/properties${qs}`).then(r => r.data),
   })
@@ -66,7 +68,8 @@ export function useGetPropertiesByResidenceIds({ projects = '' } = {}) {
 
 export function useCreateProperty() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: values => httpClient.post('properties', values).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -78,7 +81,8 @@ export function useCreateProperty() {
 
 export function useUpdateProperty() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ values, id }) => httpClient.post(`properties/${id}?_method=PUT`, values).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -91,7 +95,8 @@ export function useUpdateProperty() {
 
 export function useDeleteProperty() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ id }) => httpClient.delete(`properties/${id}`).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -103,7 +108,8 @@ export function useDeleteProperty() {
 
 export function useUpdateStateProperty() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ values, id }) => httpClient.post(`properties/${id}/change/state?_method=PUT`, values).then(r => r.data),
     onSuccess: (data, { id }) => {
       toast.success(data?.message)
@@ -115,7 +121,8 @@ export function useUpdateStateProperty() {
 
 export function useAddPropertyPrice() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ values }) => httpClient.post('property/prices', values).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -127,7 +134,8 @@ export function useAddPropertyPrice() {
 
 export function useUpdatePropertyPrice() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ values, id }) => httpClient.put(`property/prices/${id}`, values).then(r => r.data),
     onSuccess: data => {
       toast.success(data?.message)
@@ -139,7 +147,8 @@ export function useUpdatePropertyPrice() {
 
 export function useUploadDocuments() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ values, propertyId }) => httpClient.post(`properties/${propertyId}/documents`, values).then(r => r.data),
     onSuccess: (data, { propertyId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.properties.documents(propertyId) })
@@ -150,7 +159,8 @@ export function useUploadDocuments() {
 
 export function useUploadImages() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: ({ values, propertyId }) => httpClient.post(`properties/${propertyId}/images`, values).then(r => r.data),
     onSuccess: (data, { propertyId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.properties.images(propertyId) })
@@ -161,7 +171,8 @@ export function useUploadImages() {
 
 export function useDeleteImage() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: id => httpClient.delete(`files/image/${id}`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.properties.all }),
     onError: err => toast.error(err.message),
@@ -170,7 +181,8 @@ export function useDeleteImage() {
 
 export function useDeleteDocument() {
   const queryClient = useQueryClient()
-  return useMutation({
+  
+return useMutation({
     mutationFn: id => httpClient.delete(`files/document/${id}`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.properties.all }),
     onError: err => toast.error(err.message),
@@ -182,7 +194,8 @@ export const useGetAppointments = ({ id = '', resource = '', states = '' } = {})
     ...(resource === 'client' ? { clientId: id } : { documentId: id }),
     ...(states?.length ? { states: `[${states}]` } : {}),
   })
-  return useQuery({
+  
+return useQuery({
     queryKey: queryKeys.appointments.list({ id, resource, states }),
     queryFn:  () => httpClient.get(`appointments${qs}`).then(r => r.data),
     enabled:  Boolean(id),

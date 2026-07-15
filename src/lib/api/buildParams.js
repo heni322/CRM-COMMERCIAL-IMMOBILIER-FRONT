@@ -42,7 +42,8 @@ export function buildParams(params = {}, allowFalse = []) {
   }
 
   const str = sp.toString()
-  return str ? `?${str}` : ''
+  
+return str ? `?${str}` : ''
 }
 
 /**
@@ -51,5 +52,6 @@ export function buildParams(params = {}, allowFalse = []) {
  */
 export function paginationParams({ paginated, page, pageSize }) {
   if (!paginated) return {}
-  return { paginated: 'true', page_size: pageSize, page }
+  
+return { paginated: 'true', page_size: pageSize, page }
 }

@@ -82,7 +82,8 @@ httpClient.interceptors.response.use(
 function getCookie(name) {
   if (typeof document === 'undefined') return null
   const match = document.cookie.match(new RegExp(`(^|;\\s*)${name}=([^;]*)`))
-  return match ? match[2] : null
+  
+return match ? match[2] : null
 }
 
 /**
@@ -97,7 +98,8 @@ function extractMessage(payload, fallback) {
     const firstKey = Object.keys(payload.errors)[0]
     if (firstKey) return payload.errors[firstKey][0]
   }
-  return fallback
+  
+return fallback
 }
 
 export default httpClient

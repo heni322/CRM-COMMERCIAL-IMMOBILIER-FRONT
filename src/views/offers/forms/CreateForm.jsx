@@ -85,15 +85,18 @@ const CreateForm = () => {
     // Validate required fields before attempting to create
     if (!formInputParent?.d_client_id) {
       toast.error('Veuillez selectionner un client.')
-      return
+      
+return
     }
     if (!Array.isArray(formInputParent?.project_ids) || formInputParent.project_ids.length === 0) {
       toast.error('Veuillez selectionner au moins une residence.')
-      return
+      
+return
     }
     if (formInputParent?.nature === null || formInputParent?.nature === undefined) {
       toast.error('Veuillez choisir le type de document.')
-      return
+      
+return
     }
 
     try {

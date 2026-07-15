@@ -36,7 +36,7 @@ import { useUploadReport, useUploadReportVersion } from 'src/services/dossier.se
 
 // import DialogAddUserInfo from './add-user-modal'
 import moment from 'moment'
-import { useGetUserGroups, useGetUsers } from 'src/services/users.service'
+import { useGetUsers } from 'src/services/users.service'
 import FileUploaderMultiple from 'src/components/CustomFileUpload'
 import { useAuth } from 'src/hooks/useAuth'
 import { useGetGroups } from 'src/services/groups.service'
@@ -74,7 +74,7 @@ const UploadReport = ({ folder, report, reportType }) => {
   const uploadReportVersion = useUploadReportVersion(report?.id)
 
   // const getClientsList = useGetUsers({ role: 'client' })
-  const getClientsList = useGetUserGroups()
+  const getClientsList = useGetUsers({ role: 'client' })
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 

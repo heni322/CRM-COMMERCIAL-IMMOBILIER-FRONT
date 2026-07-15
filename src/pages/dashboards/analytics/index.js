@@ -31,7 +31,8 @@ import {
 // ─── Section label component ───────────────────────────────────────────────
 const SectionLabel = ({ icon, title, subtitle, accentColor = '#6366f1' }) => {
   const theme = useTheme()
-  return (
+
+return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
       <Box sx={{
         width: 38, height: 38, borderRadius: 2.5,
@@ -98,7 +99,8 @@ const AnalyticsDashboard = () => {
 
   const filteredSoldProperties = soldProperties.filter(p => {
     const q = searchTerm.toLowerCase()
-    return (
+
+return (
       p.reference?.toLowerCase().includes(q) ||
       p.entitled?.toLowerCase().includes(q) ||
       p.project?.toLowerCase().includes(q) ||
@@ -125,7 +127,7 @@ const AnalyticsDashboard = () => {
     {
       number: propertyStats?.properties_no_dispo?.value,
       icon: 'bi:building-slash',
-      title: 'Biens Indisponibles',
+      title: 'Biens Réservés',
       subtitle: 'Réservés ou suspendus',
       value: propertyStats?.properties_no_dispo?.percentage,
       color: '#f59e0b'
