@@ -1,5 +1,5 @@
 /**
- * documents.service.js — file/document viewing & deletion
+ * documents.service.js — file/document viewing, deletion & status management
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -44,6 +44,22 @@ return useMutation({
       queryClient.invalidateQueries({ queryKey: queryKeys.residences.all })
       queryClient.invalidateQueries({ queryKey: queryKeys.properties.all })
       queryClient.invalidateQueries({ queryKey: queryKeys.clients.all })
+    },
+    onError: err => toast.error(err.message),
+  })
+}
+
+export function useUpdateDocumentStatus() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, status }) => httpClient.put(`files/document/${id}/status`, { status }).then(r => r.data),
+    onSuccess: () => {
+      toast.success('Statut du document mis à jour avec succès')
+      queryClient.invalidateQueries({ queryKey: queryKeys.residences.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.properties.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.clients.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.offers.all })
     },
     onError: err => toast.error(err.message),
   })

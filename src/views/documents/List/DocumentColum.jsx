@@ -1,5 +1,5 @@
-import { Box, LinearProgress, Tooltip, Typography } from '@mui/material'
-import { Fab, IconButton, Menu, MenuItem } from '@mui/material'
+import { Box, LinearProgress, Tooltip, Typography, Select, MenuItem } from '@mui/material'
+import { Fab, IconButton, Menu } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import { styled } from '@mui/material/styles'
 import Link from 'next/link'
@@ -8,7 +8,36 @@ import { useState } from 'react'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import DialogAlert from 'src/components/DialogAlert'
 import { useAuth } from 'src/hooks/useAuth'
-import { useDeleteDocument, useDownloadDocument } from 'src/services/documents.service'
+import { useDeleteDocument, useDownloadDocument, useUpdateDocumentStatus } from 'src/services/documents.service'
+
+const STATUS_OPTIONS = [
+  { value: 'en_attente', label: 'En attente', color: '#F59E0B' },
+  { value: 'en_cours', label: 'En cours', color: '#3B82F6' },
+  { value: 'valide', label: 'Validé', color: '#10B981' },
+  { value: 'refuse', label: 'Refusé', color: '#EF4444' }
+]
+
+const StatusBadge = ({ status }) => {
+  const option = STATUS_OPTIONS.find(o => o.value === status) || STATUS_OPTIONS[0]
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '2px 10px',
+        borderRadius: '9999px',
+        fontSize: '0.75rem',
+        fontWeight: 500,
+        backgroundColor: `${option.color}20`,
+        color: option.color,
+        border: `1px solid ${option.color}`
+      }}
+    >
+      {option.label}
+    </span>
+  )
+}
 
 const RowOptions = ({ row }) => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -81,6 +110,31 @@ const RowOptions = ({ row }) => {
   )
 }
 
+const StatusCell = ({ row }) => {
+  const updateStatusMutation = useUpdateDocumentStatus()
+
+  const handleStatusChange = async newStatus => {
+    try {
+      await updateStatusMutation.mutateAsync({ id: row?.id, status: newStatus })
+    } catch (error) {}
+  }
+
+  return (
+    <Select
+      size='small'
+      value={row?.status || 'en_attente'}
+      onChange={e => handleStatusChange(e.target.value)}
+      sx={{ minWidth: 130, fontSize: '0.8rem' }}
+    >
+      {STATUS_OPTIONS.map(opt => (
+        <MenuItem key={opt.value} value={opt.value}>
+          <span style={{ color: opt.color, fontWeight: 500 }}>{opt.label}</span>
+        </MenuItem>
+      ))}
+    </Select>
+  )
+}
+
 const DocumentColum = ({ userRole }) => {
   const auth = useAuth()
   switch (userRole) {
@@ -92,6 +146,14 @@ const DocumentColum = ({ userRole }) => {
           field: 'entitled',
           headerName: 'Intitulé',
           align: 'center'
+        },
+        {
+          headerAlign: 'center',
+          flex: 0.1,
+          field: 'status',
+          headerName: 'Statut',
+          align: 'center',
+          renderCell: ({ row }) => <StatusCell row={row} />
         },
         {
           headerAlign: 'center',
@@ -128,10 +190,6 @@ const DocumentColum = ({ userRole }) => {
               <Icon icon={row?.state?.icon} />
             </CustomAvatar>
           )
-
-          // row?.active === 1 ? (
-          // ) : (
-          // )
         },
         {
           headerAlign: 'center',
@@ -139,25 +197,6 @@ const DocumentColum = ({ userRole }) => {
           field: 'reference',
           headerName: 'Reference',
           align: 'center'
-
-          // renderCell: ({ row }) => (
-          //   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          //     <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
-          //       <StyledLink href={`/apps/dossiers/${row.reference}/details-dossier/`}>{row.name}</StyledLink>
-          //       <Typography noWrap variant='caption'></Typography>
-          //     </Box>
-          //   </Box>
-
-          //   // <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          //   //   {/* <Img src={row.img} alt={`project-${row.projectTitle}`} /> */}
-          //   //   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          //   //     <Typography sx={{ fontWeight: 500, fontSize: '0.875rem' }}>{row.name}</Typography>
-          //   //     {/* <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-          //   //       {row.projectType}
-          //   //     </Typography> */}
-          //   //   </Box>
-          //   // </Box>
-          // )
         },
         {
           headerAlign: 'center',
@@ -165,41 +204,22 @@ const DocumentColum = ({ userRole }) => {
           field: 'name',
           headerName: 'Intitulée',
           align: 'center'
-
-          // renderCell: ({ row }) => <Typography variant='body2'>{row?.name}</Typography>
         },
-
-        // {
-        //   headerAlign: 'center',
-        //   flex: 0.15,
-        //   field: 'email',
-        //   headerName: 'Email',
-        //   align: 'center'
-
-        //   // renderCell: ({ row }) => <Typography variant='body2'>{row?.email}</Typography>
-        // },
+        {
+          headerAlign: 'center',
+          flex: 0.1,
+          field: 'status',
+          headerName: 'Statut',
+          align: 'center',
+          renderCell: ({ row }) => <StatusBadge status={row?.status} />
+        },
         {
           headerAlign: 'center',
           flex: 0.15,
           field: 'phone_number',
           headerName: 'N° Téléphone',
           align: 'center'
-
-          // renderCell: ({ row }) => <Typography variant='body2'>{row?.email}</Typography>
         },
-
-        // {
-        //   headerAlign: 'center',
-        //   flex: 0.12,
-        //   field: 'email',
-        //   headerName: 'Email',
-        //   renderCell: ({ row }) => {
-        //     const state = states?.find(e => row?.state === e?.id)
-
-        //     return <CustomChip label={state?.description} skin='light' color={state?.color} />
-        //   }
-        // },
-
         {
           headerAlign: 'center',
           flex: 0.16,
@@ -207,8 +227,6 @@ const DocumentColum = ({ userRole }) => {
           field: 'address',
           headerName: 'Adresse',
           align: 'center'
-
-          // renderCell: ({ row }) => <Typography variant='body2'>{row?.created_at}</Typography>
         },
         {
           headerAlign: 'center',
@@ -217,18 +235,6 @@ const DocumentColum = ({ userRole }) => {
           headerName: 'Durée de traitement',
           align: 'center'
         },
-
-        // {
-        //   headerAlign: 'center',
-        //   flex: 0.16,
-        //   minWidth: 100,
-        //   field: 'created_at',
-        //   headerName: 'Date de création',
-        //   align: 'center'
-
-        //   // renderCell: ({ row }) => <Typography variant='body2'>{row?.created_at}</Typography>
-        // },
-
         {
           headerAlign: 'center',
           flex: 0.1,

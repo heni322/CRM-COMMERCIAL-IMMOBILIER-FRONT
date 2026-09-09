@@ -11,11 +11,31 @@ import IconifyIcon from 'src/@core/components/icon'
 import { Carousel } from '@material-tailwind/react'
 import Icon from 'src/@core/components/icon'
 
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Divider, IconButton } from '@mui/material'
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Divider, IconButton, Select, MenuItem } from '@mui/material'
 import FileDialog from 'src/components/FileDialog'
 import DialogAlert from 'src/components/DialogAlert'
 import moment from 'moment'
-import { useDeleteDocument } from 'src/services/residences.service'
+import { useDeleteDocument, useUpdateDocumentStatus } from 'src/services/documents.service'
+
+const STATUS_OPTIONS = [
+  { value: 'en_attente', label: 'En attente', color: '#F59E0B' },
+  { value: 'en_cours', label: 'En cours', color: '#3B82F6' },
+  { value: 'valide', label: 'Validé', color: '#10B981' },
+  { value: 'refuse', label: 'Refusé', color: '#EF4444' }
+]
+
+const StatusBadge = ({ status }) => {
+  const option = STATUS_OPTIONS.find(o => o.value === status) || STATUS_OPTIONS[0]
+
+  return (
+    <span
+      className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'
+      style={{ backgroundColor: `${option.color}20`, color: option.color, border: `1px solid ${option.color}` }}
+    >
+      {option.label}
+    </span>
+  )
+}
 
 const CardDocuments = ({ documents }) => {
   const router = useRouter()
@@ -27,6 +47,7 @@ const CardDocuments = ({ documents }) => {
   const [suspendDialogOpen, setSuspendDialogOpen] = useState(false)
 
   const deleteImageMutation = useDeleteDocument()
+  const updateStatusMutation = useUpdateDocumentStatus()
 
   const handleCloseFileDialog = () => {
     setSelectedFile(null)
@@ -42,11 +63,14 @@ const CardDocuments = ({ documents }) => {
 
   const handleDownloadFile = async item => {
     try {
-      // i have an url of the file i want to download it from here
       window.open(`${item?.assets_file}/download`, '_blank')
-    } catch (error) {
+    } catch (error) {}
+  }
 
-    }
+  const handleStatusChange = async (documentId, newStatus) => {
+    try {
+      await updateStatusMutation.mutateAsync({ id: documentId, status: newStatus })
+    } catch (error) {}
   }
 
   return (
@@ -55,17 +79,19 @@ const CardDocuments = ({ documents }) => {
         <table className='min-w-full divide-y divide-gray-200'>
           <thead className='bg-gray-50'>
             <tr>
-              <th className='text-center w-5/12 px-6 py-3 text-xs font-medium tracking-wider  text-gray-500 uppercase '>
+              <th className='text-center w-4/12 px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase'>
                 Nom du Document
               </th>
-              {/* Show Type column on small screens only */}
-              <th className='text-center w-3/12 hidden px-6 py-3 text-xs font-medium tracking-wider  text-gray-500 uppercase sm:table-cell '>
+              <th className='text-center w-2/12 px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase'>
+                Statut
+              </th>
+              <th className='text-center w-2/12 hidden px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase sm:table-cell'>
                 Date du création
               </th>
-              <th className='text-center w-2/12 hidden px-6 py-3 text-xs font-medium tracking-wider  text-gray-500 uppercase sm:table-cell '>
+              <th className='text-center w-2/12 hidden px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase sm:table-cell'>
                 Créé par
               </th>
-              <th className='text-center w-1/12 px-6 py-3 text-xs font-medium tracking-wider  text-gray-500 uppercase'>
+              <th className='text-center w-2/12 px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase'>
                 Actions
               </th>
             </tr>
@@ -76,8 +102,20 @@ const CardDocuments = ({ documents }) => {
                 <td className='text-center px-6 py-2 whitespace-nowrap text-sm max-w-[100px] overflow-hidden truncate'>
                   {item?.name}
                 </td>
-
-                {/* Show Type column on small screens only */}
+                <td className='text-center px-6 py-2 whitespace-nowrap text-sm'>
+                  <Select
+                    size='small'
+                    value={item?.status || 'en_attente'}
+                    onChange={e => handleStatusChange(item?.id, e.target.value)}
+                    sx={{ minWidth: 130, fontSize: '0.8rem' }}
+                  >
+                    {STATUS_OPTIONS.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        <span style={{ color: opt.color, fontWeight: 500 }}>{opt.label}</span>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </td>
                 <td className='text-center hidden sm:table-cell px-6 py-2 whitespace-nowrap text-sm max-w-[100px] overflow-hidden truncate'>
                   {moment(item?.created_at)?.format('DD-MM-YYYY')}
                 </td>
@@ -86,7 +124,6 @@ const CardDocuments = ({ documents }) => {
                 </td>
                 <td className='text-center px-6 py-2 whitespace-nowrap'>
                   <div className='flex items-center space-x-4'>
-                    {/* See File Icon */}
                     <IconButton>
                       <Icon
                         icon='mdi:eye'
@@ -98,7 +135,6 @@ const CardDocuments = ({ documents }) => {
                         }}
                       />
                     </IconButton>
-                    {/* Download File Icon */}
                     <IconButton>
                       <Icon
                         icon='mdi:download'
@@ -109,7 +145,6 @@ const CardDocuments = ({ documents }) => {
                         }}
                       />
                     </IconButton>
-                    {/* Delete File Icon */}
                     <IconButton>
                       <Icon
                         icon='mdi:trash-can'

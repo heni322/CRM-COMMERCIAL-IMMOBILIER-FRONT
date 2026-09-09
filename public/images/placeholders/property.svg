@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" role="img" aria-label="Aucune photo pour ce bien">
+  <rect width="160" height="160" fill="#EEF2F7"/>
+  <g fill="none" stroke="#9AAFC7" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M34 76 80 40l46 36"/>
+    <path d="M46 74v44h68V74"/>
+    <path d="M68 118V92h24v26"/>
+  </g>
+</svg>

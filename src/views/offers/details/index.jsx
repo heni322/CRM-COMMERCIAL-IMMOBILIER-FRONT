@@ -1,50 +1,27 @@
-import MainCard from 'src/components/MainCard'
-import LocalList from 'src/views/properties/show/details'
 import React, { useEffect, useState } from 'react'
-import Grid from '@mui/material/Grid'
+import { useRouter } from 'next/router'
+import moment from 'moment'
+import toast from 'react-hot-toast'
+import DatePicker from 'react-datepicker'
+
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import CardMedia from '@mui/material/CardMedia'
-import Typography from '@mui/material/Typography'
-import { useRouter } from 'next/router'
-import IconifyIcon from 'src/@core/components/icon'
-import { Carousel } from '@material-tailwind/react'
-import Icon from 'src/@core/components/icon'
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Divider,
-  IconButton,
-  Autocomplete,
-  TextField,
-  Box,
-  Checkbox
-} from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabList from '@mui/lab/TabList'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
+import { Autocomplete, Button, Checkbox, IconButton, TextField } from '@mui/material'
 
-import PropertyDescription from './PropertyDescription'
-import CardDescription from './CardDescription'
-import CardTimeLine from './CardTimeLine'
-import CardDocuments from './CardDocuments'
-import CardImages from './CardImages'
-import { LoadingButton } from '@mui/lab'
-import DatePicker from 'react-datepicker'
-import toast from 'react-hot-toast'
-
-import useStates from 'src/hooks/useStates'
+import MainCard from 'src/components/MainCard'
+import Icon from 'src/@core/components/icon'
+import IconifyIcon from 'src/@core/components/icon'
 import CustomCurrency from 'src/components/CustomCurrency'
+import CurrencyInput from 'src/components/CurrencyInput'
 import Calendar from 'src/views/calendar'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+import PropertyLineCard from './PropertyLineCard'
 
-import moment from 'moment'
 import {
   useCreateOfferPayment,
   useGetBanks,
@@ -52,8 +29,6 @@ import {
   useGetDocumentsPaymentTypes,
   useUpdateOfferPayment
 } from 'src/services/offers.service'
-import CurrencyInput from 'src/components/CurrencyInput'
-import CurrencyFormat from 'react-currency-format'
 
 const Property = ({ offerId, offerData, offerQuery }) => {
   const router = useRouter()
@@ -98,6 +73,21 @@ const Property = ({ offerId, offerData, offerQuery }) => {
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
+  }
+
+  /**
+   * FIX: the document detail screen listed the biens as plain text with no way to
+   * open them. Every document line carries its d_property_id, so we can route
+   * straight to the bien detail page.
+   */
+  const goToPropertyDetails = propertyId => {
+    if (!propertyId) {
+      toast.error("Aucun bien n'est rattaché à cette ligne du document.")
+
+      return
+    }
+
+    router.push(`/properties/${propertyId}/details`)
   }
 
   const handleInputChange = (index, event) => {
@@ -465,13 +455,18 @@ const Property = ({ offerId, offerData, offerQuery }) => {
                           />
                           <span className='font-bold text-gray-800 text-1xl'>Liste de ses biens:</span>
                         </div>
-                        <div className='flex flex-col gap-4'>
+                        <div className='flex flex-col gap-3'>
                           {offerData?.details?.map((item, index) => (
-                            <div className='flex items-center ml-8' key={index}>
-                              <span className='font-bold text-gray-800'>Bien {index + 1}:</span>
-                              <span className='ml-1'>{item?.entitled_property}</span>
-                            </div>
+                            <PropertyLineCard
+                              key={item?.id ?? index}
+                              index={index}
+                              line={item}
+                              onOpen={() => goToPropertyDetails(item?.d_property_id)}
+                            />
                           ))}
+                          {!offerData?.details?.length && (
+                            <span className='text-gray-500'>Aucun bien rattaché à ce document.</span>
+                          )}
                         </div>
                       </div>
                     </div>

@@ -88,6 +88,7 @@ const RowOptions = ({ row }) => {
           <Icon icon='mdi:eye-outline' fontSize={20} />
           View
         </MenuItem> */}
+
         <MenuItem onClick={handleEdit} sx={{ '& svg': { mr: 2 } }}>
           <Icon icon='mdi:pencil-outline' fontSize={20} />
           Modifier
@@ -202,6 +203,26 @@ const OfferColumn = ({ userRole, columnProfile }) => {
             <Typography variant='body2'>{moment(row?.created_at)?.format('DD-MM-YYYY')}</Typography>
           )
         },
+        {
+          headerAlign: 'center',
+          flex: 0.12,
+          field: 'state_data',
+          headerName: 'Statut',
+          align: 'center',
+          renderCell: ({ row }) => (
+            row?.state_data ? (
+              <CustomChip
+                skin='light'
+                size='small'
+                label={row.state_data.entitled}
+                color={row.state_data.color ?? 'primary'}
+                sx={{ textTransform: 'capitalize', fontWeight: 600 }}
+              />
+            ) : (
+              <Typography variant='body2'>—</Typography>
+            )
+          )
+        },
 
         {
           headerAlign: 'center',
@@ -237,6 +258,26 @@ const OfferColumn = ({ userRole, columnProfile }) => {
             <CustomAvatar sx={{ width: 30, height: 30 }} skin='light' color={row?.state?.color} variant='rounded'>
               <Icon icon={row?.state?.icon} />
             </CustomAvatar>
+          )
+        },
+        {
+          headerAlign: 'center',
+          flex: 0.15,
+          field: 'state_data',
+          headerName: 'Statut',
+          align: 'center',
+          renderCell: ({ row }) => (
+            row?.state_data ? (
+              <CustomChip
+                skin='light'
+                size='small'
+                label={row.state_data.entitled}
+                color={row.state_data.color ?? 'primary'}
+                sx={{ textTransform: 'capitalize', fontWeight: 600 }}
+              />
+            ) : (
+              <Typography variant='body2'>—</Typography>
+            )
           )
         },
 

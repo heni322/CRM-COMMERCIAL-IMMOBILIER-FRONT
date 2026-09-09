@@ -82,7 +82,7 @@ const UpdateForm = Client => {
 
   const [formInput, setFormInput] = useState({
     name: '',
-    civility: 'Mr',
+    civility: '',
     email: '',
     address: '',
     phone_number_1: '',
@@ -182,10 +182,12 @@ const UpdateForm = Client => {
               <InputLabel>Civilité</InputLabel>
               <Select
                 name='civility'
-                value={formInput?.civility || 'Mr'}
+                value={formInput?.civility || ''}
                 onChange={handleChange}
                 label='Civilité'
+                displayEmpty
               >
+                <MenuItem value=''>Non précisé</MenuItem>
                 <MenuItem value='Mr'>Mr</MenuItem>
                 <MenuItem value='Mme'>Mme</MenuItem>
               </Select>

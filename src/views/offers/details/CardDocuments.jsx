@@ -11,11 +11,19 @@ import IconifyIcon from 'src/@core/components/icon'
 import { Carousel } from '@material-tailwind/react'
 import Icon from 'src/@core/components/icon'
 
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Divider, IconButton } from '@mui/material'
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Divider, IconButton, Select, MenuItem } from '@mui/material'
 import FileDialog from 'src/components/FileDialog'
 import DialogAlert from 'src/components/DialogAlert'
 import moment from 'moment'
 import { useDeleteDocument } from 'src/services/properties.service'
+import { useUpdateDocumentStatus } from 'src/services/documents.service'
+
+const STATUS_OPTIONS = [
+  { value: 'en_attente', label: 'En attente', color: '#F59E0B' },
+  { value: 'en_cours', label: 'En cours', color: '#3B82F6' },
+  { value: 'valide', label: 'Validé', color: '#10B981' },
+  { value: 'refuse', label: 'Refusé', color: '#EF4444' }
+]
 
 const CardDocuments = ({ documents }) => {
   const router = useRouter()
@@ -27,6 +35,7 @@ const CardDocuments = ({ documents }) => {
   const [suspendDialogOpen, setSuspendDialogOpen] = useState(false)
 
   const deleteImageMutation = useDeleteDocument()
+  const updateStatusMutation = useUpdateDocumentStatus()
 
   const handleCloseFileDialog = () => {
     setSelectedFile(null)
@@ -40,17 +49,25 @@ const CardDocuments = ({ documents }) => {
     } catch (error) {}
   }
 
+  const handleStatusChange = async (documentId, newStatus) => {
+    try {
+      await updateStatusMutation.mutateAsync({ id: documentId, status: newStatus })
+    } catch (error) {}
+  }
+
   return (
     <div className='overflow-x-auto max-h-[400px]'>
       {documents && documents?.length > 0 ? (
         <table className='min-w-full divide-y divide-gray-200'>
           <thead className='bg-gray-50'>
             <tr>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider '>
+              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                 Nom du Document
               </th>
-              {/* Show Type column on small screens only */}
-              <th className='hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider '>
+              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                Statut
+              </th>
+              <th className='hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                 Date du création
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
@@ -64,13 +81,25 @@ const CardDocuments = ({ documents }) => {
                 <td className='px-6 py-2 whitespace-nowrap text-sm max-w-[100px] overflow-hidden truncate'>
                   {item?.path}
                 </td>
-                {/* Show Type column on small screens only */}
+                <td className='px-6 py-2 whitespace-nowrap text-sm'>
+                  <Select
+                    size='small'
+                    value={item?.status || 'en_attente'}
+                    onChange={e => handleStatusChange(item?.id, e.target.value)}
+                    sx={{ minWidth: 130, fontSize: '0.8rem' }}
+                  >
+                    {STATUS_OPTIONS.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        <span style={{ color: opt.color, fontWeight: 500 }}>{opt.label}</span>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </td>
                 <td className='hidden sm:table-cell px-6 py-2 whitespace-nowrap text-sm max-w-[100px] overflow-hidden truncate'>
                   {moment(item?.created_at)?.format('DD-MM-YYYY')}
                 </td>
                 <td className='px-6 py-2 whitespace-nowrap'>
                   <div className='flex items-center space-x-4'>
-                    {/* See File Icon */}
                     <IconButton>
                       <Icon
                         icon='mdi:eye'
@@ -82,7 +111,6 @@ const CardDocuments = ({ documents }) => {
                         }}
                       />
                     </IconButton>
-                    {/* Delete File Icon */}
                     <IconButton>
                       <Icon
                         icon='mdi:trash-can'
@@ -121,7 +149,6 @@ const CardDocuments = ({ documents }) => {
         acceptButtonTitle='Accepter'
         declineButtonTitle='Annuler'
         handleAction={e => {
-
           if (e === true) {
             handleDelete()
           } else setSuspendDialogOpen(false)
